@@ -254,12 +254,14 @@ class Field extends Component
         return $this->required ?? false;
     }
 
-    public function isRequiredWhen(): bool
+    public function isSaveable(): bool
     {
         $isRequired = $this->isRequired();
 
         if (
             $isRequired === true &&
+            $this->save() === true &&
+            $this->isEmpty() === true &&
             empty($this->when) === false &&
             is_array($this->when) === true
         ) {
@@ -323,12 +325,7 @@ class Field extends Component
         $this->errors = [];
 
         // validate required values
-        if (
-            $this->isRequired() === true &&
-            $this->save() === true &&
-            $this->isEmpty() === true &&
-            $this->isRequiredWhen() === true
-        ) {
+        if ($this->isSaveable() === true) {
             $this->errors['required'] = I18n::translate('error.validation.required');
         }
 
