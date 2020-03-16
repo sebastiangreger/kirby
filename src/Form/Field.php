@@ -254,15 +254,18 @@ class Field extends Component
         return $this->required ?? false;
     }
 
-    public function isSaveable(): bool
+    protected function isSaveable(): bool
     {
         if ($this->isRequired() === true && $this->save() === true && $this->isEmpty() === true) {
+            // check the data of the relevant fields if there is a when option
             if (empty($this->when) === false && is_array($this->when) === true) {
                 $input = $this->attrs['input'] ?? [];
 
                 if (empty($input) === false) {
                     foreach ($this->when as $field => $value) {
-                        if (isset($input[$field]) === true && $input[$field] !== $value) {
+                        // if the input data doesn't have data for when fields
+                        // or doesn't match, that means is not required and return true
+                        if (($input[$field] ?? '') !== $value) {
                             return true;
                         }
                     }
