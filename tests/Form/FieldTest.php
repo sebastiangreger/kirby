@@ -699,4 +699,74 @@ class FieldTest extends TestCase
         $this->assertEquals('1/2', $field->width());
         $this->assertEquals('1/2', $field->width);
     }
+
+    public function testWhenValid()
+    {
+        Field::$types = [
+            'foo' => [],
+            'bar' => []
+        ];
+
+        $page = new Page(['slug' => 'test']);
+
+        // default
+        $field = new Field('foo', [
+            'model' => $page,
+        ]);
+
+        $this->assertEquals([], $field->errors());
+
+        // required with when
+        // 'bar' is required if 'foo' value 'a'
+        $field = new Field('bar', [
+            'model' => $page,
+            'required' => true,
+            'when' => [
+                'foo' => 'a'
+            ],
+            'input' => [
+                'foo' => 'not-a',
+                'bar' => ''
+            ]
+        ]);
+
+        $this->assertEquals([], $field->errors());
+    }
+
+    public function testWhenInValid()
+    {
+        Field::$types = [
+            'foo' => [],
+            'bar' => []
+        ];
+
+        $page = new Page(['slug' => 'test']);
+
+        // default
+        $field = new Field('foo', [
+            'model' => $page,
+        ]);
+
+        $this->assertEquals([], $field->errors());
+
+        // required with when
+        // 'bar' is required if 'foo' value 'a'
+        $field = new Field('bar', [
+            'model' => $page,
+            'required' => true,
+            'when' => [
+                'foo' => 'a'
+            ],
+            'input' => [
+                'foo' => 'a',
+                'bar' => ''
+            ]
+        ]);
+
+        $expected = [
+            'required' => 'Please enter something',
+        ];
+
+        $this->assertEquals($expected, $field->errors());
+    }
 }
