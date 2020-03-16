@@ -256,27 +256,23 @@ class Field extends Component
 
     public function isSaveable(): bool
     {
-        $isRequired = $this->isRequired();
+        if ($this->isRequired() === true && $this->save() === true && $this->isEmpty() === true) {
+            if (empty($this->when) === false && is_array($this->when) === true) {
+                $input = $this->attrs['input'] ?? [];
 
-        if (
-            $isRequired === true &&
-            $this->save() === true &&
-            $this->isEmpty() === true &&
-            empty($this->when) === false &&
-            is_array($this->when) === true
-        ) {
-            $input = $this->attrs['input'] ?? [];
-
-            if (empty($input) === false) {
-                foreach ($this->when as $field => $value) {
-                    if (isset($input[$field]) === true && $input[$field] !== $value) {
-                        return false;
+                if (empty($input) === false) {
+                    foreach ($this->when as $field => $value) {
+                        if (isset($input[$field]) === true && $input[$field] !== $value) {
+                            return true;
+                        }
                     }
                 }
             }
+
+            return false;
         }
 
-        return $isRequired;
+        return true;
     }
 
     public function isValid(): bool
@@ -325,7 +321,7 @@ class Field extends Component
         $this->errors = [];
 
         // validate required values
-        if ($this->isSaveable() === true) {
+        if ($this->isSaveable() === false) {
             $this->errors['required'] = I18n::translate('error.validation.required');
         }
 
