@@ -369,7 +369,10 @@ class F
             return $fallback;
         }
 
-        $result = include $file;
+        // we use the loadNative() method here to prevent the included
+        // file from overwriting our $fallback in this variable scope; see
+        // https://www.php.net/manual/en/function.include.php#example-124
+        $result = static::loadNative($file);
 
         if ($fallback !== null && gettype($result) !== gettype($fallback)) {
             return $fallback;

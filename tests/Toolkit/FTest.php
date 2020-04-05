@@ -233,6 +233,11 @@ class FTest extends TestCase
         F::write($file = $this->fixtures . '/test.php', '<?php return "foo"; ?>');
         $expected = ['a' => 'b'];
         $this->assertEquals($expected, F::load($file, $expected));
+
+        // type mismatch with overwritten $fallback
+        F::write($file = $this->fixtures . '/test.php', '<?php $fallback = "test"; return "foo"; ?>');
+        $expected = ['a' => 'b'];
+        $this->assertEquals($expected, F::load($file, $expected));
     }
 
     public function testLoadNative()
