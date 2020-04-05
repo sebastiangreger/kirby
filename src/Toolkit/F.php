@@ -357,7 +357,7 @@ class F
     }
 
     /**
-     * Loads a file and returns the result
+     * Loads a file and returns the result with an optional fallback
      *
      * @param string $file
      * @param mixed $fallback
@@ -365,7 +365,7 @@ class F
      */
     public static function load(string $file, $fallback = null)
     {
-        if (file_exists($file) === false) {
+        if (is_file($file) === false) {
             return $fallback;
         }
 
@@ -376,6 +376,40 @@ class F
         }
 
         return $result;
+    }
+
+    /**
+     * Loads a file and returns the result or `false` if the
+     * file to load does not exist
+     *
+     * @param string $file
+     * @param array $data Optional array of variables to extract in the variable scope
+     * @return mixed
+     */
+    public static function loadNative(string $file, array $data = [])
+    {
+        if (is_file($file) === false) {
+            return false;
+        }
+
+        extract($data);
+        return include $file;
+    }
+
+    /**
+     * Loads a file using `include_once()` and returns whether loading was successful
+     *
+     * @param string $file
+     * @return bool
+     */
+    public static function loadOnce(string $file): bool
+    {
+        if (is_file($file) === false) {
+            return false;
+        }
+
+        include_once $file;
+        return true;
     }
 
     /**

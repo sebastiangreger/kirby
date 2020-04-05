@@ -222,23 +222,41 @@ class FTest extends TestCase
 
     public function testLoad()
     {
+        // basic behavior
         F::write($file = $this->fixtures . '/test.php', '<?php return "foo"; ?>');
-
         $this->assertEquals('foo', F::load($file));
-    }
 
-    public function testLoadWithFallback()
-    {
+        // non-existing file
         $this->assertEquals('foo', F::load('does-not-exist.php', 'foo'));
+
+        // type mismatch
+        F::write($file = $this->fixtures . '/test.php', '<?php return "foo"; ?>');
+        $expected = ['a' => 'b'];
+        $this->assertEquals($expected, F::load($file, $expected));
     }
 
-    public function testLoadWithTypeMismatch()
+    public function testLoadNative()
     {
+        // basic behavior
         F::write($file = $this->fixtures . '/test.php', '<?php return "foo"; ?>');
+        $this->assertEquals('foo', F::loadNative($file));
 
-        $expected = ['a' => 'b'];
+        // non-existing file
+        $this->assertFalse(F::loadNative('does-not-exist.php'));
 
-        $this->assertEquals($expected, F::load($file, $expected));
+        // extract data
+        F::write($file = $this->fixtures . '/test.php', '<?php return "an $testVariable"; ?>');
+        $this->assertEquals('an imported file', F::loadNative($file, ['testVariable' => 'imported file']));
+    }
+
+    public function testLoadOnce()
+    {
+        // basic behavior
+        F::write($file = $this->fixtures . '/test.php', '<?php return "foo"; ?>');
+        $this->assertTrue(F::loadOnce($file));
+
+        // non-existing file
+        $this->assertFalse(F::loadOnce('does-not-exist.php'));
     }
 
     public function testMove()
