@@ -396,7 +396,7 @@ class F
         }
 
         extract($data);
-        return include $file;
+        return include func_get_arg(0);
     }
 
     /**
